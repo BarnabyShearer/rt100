@@ -27,7 +27,9 @@ BUTTON = [
     [7, WRIST2, -1]
 ]
 
-def scale(ctrl, max):
+def scale(ctrl, max = 1):
+    if ctrl == ZED:
+        max = -max
     return (CTRLS[ctrl][3] - CTRLS[ctrl][2]) / 20 / max
 
 def main(r):
@@ -51,18 +53,12 @@ def main(r):
                 pos[i] = ctrl[2]
             if pos[i] > ctrl[3]:
                 pos[i] = ctrl[3]
-            i += 1
             if pos[i] != old_pos[i]:
                 r.numeric(ctrl, pos[i])
+            i += 1
+        r.start()
         print(pos)
 
 if __name__ == "__main__":
-    comms = Comms('/dev/ttyUSB0')
-    def signal_handler(signal, frame):
-        comms.stop()
-        comms.join()
-        sys.exit(0)
-    signal.signal(signal.SIGINT, signal_handler)
-    comms.start()
-    r = Rtx(comms)
+    r = Rtx()
     main(r)
